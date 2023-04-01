@@ -11,39 +11,34 @@ public class Main {
 
         StringTokenizer st = new StringTokenizer(br.readLine());
         int[] solutions = new int[N];
-        for (int i = 0; i < N ; i++) {
+        for (int i = 0; i < N; i++) {
             solutions[i] = Integer.parseInt(st.nextToken());
         }
 
         Arrays.sort(solutions); // 용액들을 정렬
 
-        int L = 0;
-        int R = solutions.length - 1;
-        int temp_solution = solutions[L] + solutions[R];
-        int result_L = L, result_R = R;
-        while (L != R) {
-            if (check(temp_solution, solutions[L] + solutions[R])) {
-                temp_solution = solutions[L] + solutions[R];
-                result_L = L;
-                result_R = R;
+        int best_sum = Integer.MAX_VALUE;
+        int L = 0, R = N - 1;
+        int v1 = 0, v2 = 0;
+
+        while (L < R) { // L == R 인 상황이면 용액이 한 개 뿐이기 떄문에 종료
+            int sum = solutions[L] + solutions[R];
+
+            if (Math.abs(sum) < best_sum) { // 새롭게 계산한 sum이 기존의 best_sum보다 좋은 경우(0에 가까운 경우)
+                best_sum = Math.abs(sum);
+                v1 = solutions[L];
+                v2 = solutions[R];
             }
-            if (solutions[L] + solutions[R] == 0) {
-                break;
-            } else if (solutions[L] + solutions[R] > 0) {
+
+            if (sum > 0) {
                 R--;
             } else {
                 L++;
             }
         }
 
-        System.out.println(solutions[result_L] + " " + solutions[result_R]);
+        System.out.println(v1 + " " + v2);
 
-    }
-
-    static boolean check(int prev, int cur){
-        if(Math.abs(prev - 0) > Math.abs(cur - 0))
-            return true;
-        return false;
     }
 
 }
