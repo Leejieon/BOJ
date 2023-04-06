@@ -14,25 +14,38 @@ public class Main {
         int K = Integer.parseInt(st.nextToken());
 
         int[] distance = new int[100001];
-        Arrays.fill(distance, -1);
+        boolean[] visited = new boolean[100001];
         Queue<Integer> queue = new LinkedList<>();
         distance[N] = 0;
+        visited[N] = true;
         queue.offer(N);
 
         while(!queue.isEmpty()){
             int cur = queue.poll();
-            int[] node = new int[]{cur-1, cur+1, cur*2};
-            
-            for(int next:node){
-                if(next>=0 && next<100001 && distance[next] == -1) {
-                    distance[next] = distance[cur] + 1;
-                    queue.offer(next);
-                }
-                if(next == K){
-                    System.out.println(distance[next]);
-                    return;
-                }
+
+            // Case 1
+            int next = cur - 1;
+            if (next >= 0 && next <= 100000 && !visited[next]) {
+                visited[next] = true;
+                distance[next] = distance[cur] + 1;
+                queue.add(next);
+            }
+            // Case 2
+            next = cur + 1;
+            if (next >= 0 && next <= 100000 && !visited[next]) {
+                visited[next] = true;
+                distance[next] = distance[cur] + 1;
+                queue.add(next);
+            }
+            // Case 3
+            next = cur * 2;
+            if (next >= 0 && next <= 100000 && !visited[next]) {
+                visited[next] = true;
+                distance[next] = distance[cur] + 1;
+                queue.add(next);
             }
         }
+
+        System.out.println(distance[K]);
     }
 }
