@@ -1,17 +1,12 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
     static int N, K;
-    static ArrayList<ArrayList<Integer>> parent;
     static ArrayList<ArrayList<Integer>> child;
     static int[] weight, complete, indeg;
-    static Queue<Integer> result;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -19,8 +14,6 @@ public class Main {
         int T = Integer.parseInt(br.readLine());
 
         for (int test_case = 0; test_case < T; test_case++) {
-            result = new LinkedList<>();
-
             st = new StringTokenizer(br.readLine());
             N = Integer.parseInt(st.nextToken());
             K = Integer.parseInt(st.nextToken());
@@ -36,10 +29,8 @@ public class Main {
                 weight[i] = Integer.parseInt(st.nextToken());
             }
 
-            parent = new ArrayList<>();
             child = new ArrayList<>();
             for (int i = 0; i <= N; i++) {
-                parent.add(new ArrayList<>());
                 child.add(new ArrayList<>());
             }
 
@@ -48,7 +39,6 @@ public class Main {
                 int c = Integer.parseInt(st.nextToken());
                 int p = Integer.parseInt(st.nextToken());
 
-                parent.get(p).add(c);
                 child.get(c).add(p);
                 indeg[p]++;
             }
@@ -58,55 +48,32 @@ public class Main {
 
             topologicalSort();
 
-            while (!result.isEmpty()) {
-                int x = result.poll();
-
-                // 시작 지점일 경우
-                if (parent.get(x).isEmpty()) {
-                    complete[x] = weight[x];
-                    continue;
-                }
-
-                // 한 곳에서만 오는 경우 = In-degree 가 1인 경우
-                if (parent.get(x).size() == 1) {
-                    complete[x] = weight[x] + complete[parent.get(x).get(0)];
-                }
-                // 여러 방향에서 오는 경우는 그 중 가장 오래 걸리는 것을 가져와야 한다.
-                else {
-                    int max_time = Integer.MIN_VALUE;
-                    for (int i = 0; i < parent.get(x).size(); i++) {
-                        max_time = Math.max(max_time, complete[parent.get(x).get(i)]);
-                    }
-
-                    complete[x] = weight[x] + max_time;
-                }
-
-                // 탐색 중 건설할 건물을 만나면 종료
-                if (x == building) {
-                    break;
-                }
-            }
-
             System.out.println(complete[building]);
 
         }
     }
 
     static void topologicalSort() {
-        Queue<Integer> queue = new LinkedList<>();
+        Deque<Integer> queue = new LinkedList<>();
+
         for (int i = 1; i <= N; i++) {
-            if(indeg[i] == 0)
+            if(indeg[i] == 0) {
+                // 시작 지점일 경우, 자신의 건설 시간을 넣어준다.
+                complete[i] = weight[i];
                 queue.add(i);
+            }
         }
 
         while (!queue.isEmpty()) {
             int x = queue.poll();
-            result.add(x);
-
             for (int y : child.get(x)) {
                 indeg[y]--;
                 if(indeg[y] == 0)
                     queue.add(y);
+                // x와 y를 끊을 때, 기존에 y에 계산되어 있던 건설 시간과
+                // 이전 x의 건설 시간에 y 자신만의 건설 시간을 더한 값 중 더 큰 값을
+                // y의 최종 건설 시간에 넣어준다.
+                complete[y] = Math.max(complete[y], complete[x] + weight[y] );
             }
         }
     }
