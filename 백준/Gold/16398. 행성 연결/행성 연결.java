@@ -1,86 +1,83 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.StringTokenizer;
 
 public class Main {
-    static int[] parents;
-    static PriorityQueue<Edge> pq = new PriorityQueue<>();
+    static int N;
+    static List<List<Edge>> graph = new ArrayList<>();
+    static boolean[] visited;
 
     public static void main(String[] args) throws IOException {
         initInput();
 
-        System.out.println(makeFlow());
+        System.out.println(prim());
     }
 
     static void initInput() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         StringTokenizer st;
 
-        int N = Integer.parseInt(br.readLine());
-        initParent(N);
+        N = Integer.parseInt(br.readLine());
+
+        initGraph();
+        visited = new boolean[N];
 
         for (int y = 0; y < N; y++) {
             st = new StringTokenizer(br.readLine());
             for (int x = 0; x < N; x++) {
                 int weight = Integer.parseInt(st.nextToken());
-                if(weight != 0)
-                    pq.offer(new Edge(y, x, weight));
+                graph.get(y).add(new Edge(x, weight));
             }
         }
+
+
     }
 
-    static void initParent(int N) {
-        parents = new int[N];
-        for (int i = 0; i < N; i++) {
-            parents[i] = i;
-        }
-    }
-
-    static long makeFlow() {
+    static long prim() {
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
         long result = 0;
+        int count = 0;
+
+        pq.add(new Edge(0, 0));
 
         while (!pq.isEmpty()) {
             Edge edge = pq.poll();
 
-            if (!isSameParent(find(edge.node1), find(edge.node2))) {
-                result += edge.weight;
-                union(edge.node1, edge.node2);
+            if(visited[edge.node])
+                continue;
+
+            visited[edge.node] = true;
+            result += edge.weight;
+
+            for (Edge next : graph.get(edge.node)) {
+                if(!visited[next.node])
+                    pq.add(next);
             }
+
+            // 모든 정점을 방문했을 경우, 종료
+            if(++count == N)
+                break;
         }
 
         return result;
     }
 
-    static void union(int node1, int node2) {
-        node1 = find(node1);
-        node2 = find(node2);
-
-        if (node1 != node2) {
-            parents[node2] = node1;
+    static void initGraph() {
+        for (int i = 0; i < N; i++) {
+            graph.add(new ArrayList<>());
         }
     }
 
-    static int find(int node) {
-        if(parents[node] == node)
-            return node;
-
-        return parents[node] = find(parents[node]);
-    }
-
-    static boolean isSameParent(int node1, int node2) {
-        return find(node1) == find(node2);
-    }
-
     static class Edge implements Comparable<Edge> {
-        int node1;
-        int node2;
+        int node;
         int weight;
 
-        Edge(int node1, int node2, int weight) {
-            this.node1 = node1;
-            this.node2 = node2;
+        Edge(int node, int weight) {
+            this.node = node;
             this.weight = weight;
         }
 
