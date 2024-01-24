@@ -7,6 +7,7 @@ public class Main {
     static int N, M;
     static int[] numbers;
     static boolean[] visited;
+    static StringBuilder sb = new StringBuilder();
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -19,15 +20,16 @@ public class Main {
         visited = new boolean[N];
 
         permutation(0);
+        System.out.println(sb);
     }
 
     static void permutation(int depth) {
         // Base Case
         if (depth == M) {
             for (int number : numbers) {
-                System.out.print(number + " ");
+                sb.append(number).append(" ");
             }
-            System.out.println();
+            sb.append("\n");
             return;
         }
 
