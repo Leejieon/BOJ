@@ -16,7 +16,7 @@ public class Main {
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
         order = new int[M];
-        visited = new boolean[10001];
+        visited = new boolean[N];
 
         st = new StringTokenizer(br.readLine());
         numbers = new int[N];
@@ -42,11 +42,11 @@ public class Main {
 
         // Recursive Case
         for (int cand = 0; cand < N; cand++) {
-            if (!visited[numbers[cand]]) {
-                visited[numbers[cand]] = true;
+            if (!visited[cand]) {
+                visited[cand] = true;
                 order[depth] = numbers[cand];
                 permutation(depth + 1);
-                visited[numbers[cand]] = false;
+                visited[cand] = false;
             }
         }
     }
