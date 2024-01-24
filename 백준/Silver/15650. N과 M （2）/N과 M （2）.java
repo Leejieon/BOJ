@@ -19,41 +19,28 @@ public class Main {
         numbers = new int[M];
         visited = new boolean[N];
 
-        permutation(0);
+        permutation(0, 0);
         System.out.print(sb);
     }
 
-    static void permutation(int depth) {
+    static void permutation(int depth, int prev) {
         // Base Case
         if (depth == M) {
-            if (checkNumber()) {
-                for (int number : numbers) {
-                    sb.append(number).append(" ");
-                }
-                sb.append("\n");
+            for (int number : numbers) {
+                sb.append(number).append(" ");
             }
+            sb.append("\n");
             return;
         }
 
         // Recursive Case
-        for (int cand = 0; cand < N; cand++) {
+        for (int cand = prev; cand < N; cand++) {
             if (!visited[cand]) {
                 visited[cand] = true;
                 numbers[depth] = cand + 1;
-                permutation(depth + 1);
+                permutation(depth + 1, cand);
                 visited[cand] = false;
             }
         }
-    }
-
-    static boolean checkNumber() {
-        int prev = numbers[0];
-        for (int i = 1; i < numbers.length; i++) {
-            if (prev > numbers[i]) {
-                return false;
-            }
-            prev = numbers[i];
-        }
-        return true;
     }
 }
