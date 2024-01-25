@@ -26,19 +26,11 @@ public class Main {
 
         Arrays.sort(numbers);
         permutation(0);
-        
-        // 중복 제거
-        String[] answer = Arrays.stream(sb.toString().split("\n"))
-                .distinct()
-                .toArray(String[]::new);
-
-        sb = new StringBuilder();
-        for (String str : answer) {
-            sb.append(str).append("\n");
-        }
 
         bw.write(sb.toString());
+        bw.flush();
         bw.close();
+        br.close();
     }
 
     static void permutation(int depth) {
@@ -52,10 +44,12 @@ public class Main {
         }
 
         // Recursive Case
+        int prev = 0;
         for (int cand = 0; cand < numbers.length; cand++) {
-            if (!visited[cand]) {
+            if (!visited[cand] && prev != numbers[cand]) {
                 visited[cand] = true;
                 order[depth] = numbers[cand];
+                prev = numbers[cand];
                 permutation(depth + 1);
                 visited[cand] = false;
             }
