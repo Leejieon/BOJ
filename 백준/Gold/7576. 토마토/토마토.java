@@ -61,7 +61,7 @@ public class Main {
 
     }
 
-    static int bps() {
+    static void bps() {
 
         while (!que.isEmpty()) {
             int size = que.size();
@@ -84,13 +84,12 @@ public class Main {
                     }
                 }
                 if (que.isEmpty() && total == 0) {
-                    return count;
+                    return;
                 }
             }
             count++;
         }
 
-        return count;
     }
 
 }
