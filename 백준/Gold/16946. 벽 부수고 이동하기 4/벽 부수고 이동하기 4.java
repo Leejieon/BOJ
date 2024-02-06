@@ -1,109 +1,109 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.*;
 
 class Main {
     static int N, M;
-    static int size;
-    static int[][][] graph;
-    static boolean[][] visited;
+    static int[][] graph, group;
     static int[][] dir = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
-    static Queue<Point> roads = new LinkedList<>(); // 0의 위치를 저장하고 담는 Queue
-    static Queue<Point> walls = new LinkedList<>();
-    static Map<Integer, Integer> group = new HashMap<Integer, Integer>();
-    static int groupNum = 1;
+    static HashMap<Integer, Integer> map = new HashMap<>();
+    static int groupNum = 1; // 그룹의 번호
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = new StringTokenizer(br.readLine());
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringBuilder sb = new StringBuilder();
+        StringTokenizer st = new StringTokenizer(br.readLine());
 
         N = Integer.parseInt(st.nextToken());
         M = Integer.parseInt(st.nextToken());
 
-        visited = new boolean[N][M];
-        graph = new int[2][N][M];
+        graph = new int[N][M];
         for (int y = 0; y < N; y++) {
             String row = br.readLine();
             for (int x = 0; x < M; x++) {
-                graph[0][y][x] = row.charAt(x) - '0';
-                if (graph[0][y][x] == 0) {
-                    roads.offer(new Point(y, x));
-                } else {
-                    graph[0][y][x] = -1; // 벽을 -1로 선언
-                    walls.offer(new Point(y, x));
+                graph[y][x] = row.charAt(x) - '0';
+            }
+        }
+
+        // 0 그룹화 := map 에 그룹 번호와 그룹 크기 저장
+        group = new int[N][M];
+        for (int y = 0; y < N; y++) {
+            for (int x = 0; x < M; x++) {
+                // (y, x)가 0이고 아직 그룹화 되지 않은 경우
+                if (graph[y][x] == 0 && group[y][x] == 0) {
+                    map.put(groupNum, bfs(y, x, groupNum));
+                    groupNum++;
                 }
             }
         }
 
-        while (!roads.isEmpty()) {
-            Point point = roads.poll();
-            int y = point.y;
-            int x = point.x;
-            if (!visited[y][x]) {
-                size = 1;
-                visited[y][x] = true;
-                graph[1][y][x] = groupNum;
-                dfs(y, x);
-                group.put(groupNum, size);
-                groupNum++;
-            }
-        }
-
-        int[][] result = new int[N][M];
-        boolean[] check;
-        while (!walls.isEmpty()) {
-            check = new boolean[groupNum];
-            Point point = walls.poll();
-            int y = point.y;
-            int x = point.x;
-
-            int count = 1;
-            for (int cand = 0; cand < 4; cand++) {
-                int dy = y + dir[cand][0];
-                int dx = x + dir[cand][1];
-
-                if (isOutOfBound(dy, dx)) continue;
-                if (graph[0][dy][dx] == -1) continue;
-                if (check[graph[1][dy][dx]]) continue; // 이미 확인한 그룹일 경우
-
-                check[graph[1][dy][dx]] = true;
-                count += group.get(graph[1][dy][dx]);
-            }
-
-            result[y][x] = count % 10;
-        }
-
-
-        for (int[] rows : result) {
-            for (int number : rows) {
-                sb.append(number);
+        for (int y = 0; y < N; y++) {
+            for (int x = 0; x < M; x++) {
+                if (graph[y][x] == 1) {
+                    sb.append(getResult(y, x));
+                } else {
+                    sb.append(0);
+                }
             }
             sb.append("\n");
         }
-        System.out.print(sb);
+
+        bw.write(sb.toString());
+        bw.close();
+        br.close();
     }
 
-    static void dfs(int y, int x) {
-        for (int cand = 0; cand < 4; cand++) {
-            int dy = y + dir[cand][0];
-            int dx = x + dir[cand][1];
+    static int bfs(int y, int x, int gNum) {
+        int size = 1;
+        Queue<Point> queue = new ArrayDeque<>();
+        queue.offer(new Point(y, x));
+        group[y][x] = gNum;
 
-            if (isOutOfBound(dy, dx)) continue;
-            if (visited[dy][dx]) continue;
+        while (!queue.isEmpty()) {
+            Point point = queue.poll();
 
-            if (graph[0][dy][dx] == 0) {
-                visited[dy][dx] = true;
-                graph[1][dy][dx] = groupNum;
-                size++;
-                dfs(dy, dx);
+            for (int cand = 0; cand < dir.length; cand++) {
+                int dy = point.y + dir[cand][0];
+                int dx = point.x + dir[cand][1];
+
+                if(isOutOfBound(dy, dx)) continue;
+                if (graph[dy][dx] == 0 && group[dy][dx] == 0) {
+                    queue.offer(new Point(dy, dx));
+                    group[dy][dx] = gNum;
+                    size++;
+                }
             }
         }
+
+        return size;
     }
 
     static boolean isOutOfBound(int y, int x) {
         return y < 0 || x < 0 || y >= N || x >= M;
+    }
+
+    static int getResult(int y, int x) {
+        int sum = 1; // 자기 자신
+        HashSet<Integer> set = new HashSet<>();
+
+        for (int cand = 0; cand < dir.length; cand++) {
+            int dy = y + dir[cand][0];
+            int dx = x + dir[cand][1];
+
+            if(isOutOfBound(dy, dx)) continue;
+            if(group[dy][dx] == 0) continue; // 그룹에 해당하지 않는 경우 := 1인 경우
+            // 벽이 아니고 갈 수 있는 경우
+            if (graph[dy][dx] == 0) {
+                set.add(group[dy][dx]);
+            }
+        }
+
+        // set 에 포함된 그룹 번호에 해당하는 사이즈 더해주기
+        for (int gNum : set) {
+            sum += map.get(gNum);
+        }
+
+        return sum%10;
     }
 
     static class Point {
