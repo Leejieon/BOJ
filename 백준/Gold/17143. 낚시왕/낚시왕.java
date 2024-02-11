@@ -7,7 +7,6 @@ import java.util.StringTokenizer;
 class Main {
     static int R, C, M;
     static Shark[][] sea;
-    static ArrayList<Shark> visited;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -33,9 +32,7 @@ class Main {
         for (int loc = 1; loc < C + 1; loc++) {
             // 상어 잡기
             total += getShark(loc);
-
             // 모든 상어 움직이기
-            visited = new ArrayList<>();
             moveAllSharks();
         }
 
@@ -55,6 +52,7 @@ class Main {
     }
 
     static void moveAllSharks() {
+        // 현재 순서에 이동한 상어들을 저장할 배열
         Shark[][] result = new Shark[R + 1][C + 1];
 
         for (int y = 1; y < R + 1; y++) {
@@ -62,10 +60,6 @@ class Main {
                 if(sea[y][x] == null) continue;
 
                 Shark shark = sea[y][x];
-                if(visited.contains(shark)) continue;
-
-                visited.add(shark);
-                sea[y][x] = null;
                 int nextY = y;
                 int nextX = x;
 
@@ -163,7 +157,8 @@ class Main {
             }
         }
 
-        sea = result.clone();
+        // 상어들의 이동이 완료된 배열을 기존 배열로 복사
+        sea = result;
     }
 
     static class Shark {
