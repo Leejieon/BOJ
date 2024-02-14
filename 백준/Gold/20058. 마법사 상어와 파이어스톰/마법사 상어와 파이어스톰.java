@@ -52,9 +52,7 @@ class Main {
                 }
             }
             // 기존 배열에 복사
-            for (int j = 0; j < size; j++) {
-                graph[j] = clone[j].clone();
-            }
+            graph = clone;
             // 얼음 확인
             reduceIce();
         }
