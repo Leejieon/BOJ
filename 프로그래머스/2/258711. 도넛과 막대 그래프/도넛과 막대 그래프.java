@@ -50,22 +50,12 @@ class Solution {
     }
     
     static int findStartNode() {
-        ArrayList<Integer> nodes = new ArrayList<>();
         for(int i = 1; i <= N; i++) {
-            if(inDegrees[i] == 0) {
-                nodes.add(i);
+            if(inDegrees[i] == 0 && graph[i].size() > 1) {
+                return i;
             }
         }
-        
-        int result = 0;
-        int temp = -1;
-        for(int node : nodes) {
-            if(temp < graph[node].size()) {
-                result = node;
-                temp = graph[node].size();
-            }
-        }
-        return result;
+        return -1;
     }
     
     static void countCycle(int node) {
@@ -82,15 +72,6 @@ class Solution {
         visited[node] = true;
         for(int next : graph[node]) {
             countCycle(next);
-        }
-    }
-    
-    static class Edge {
-        int from, to;
-        
-        Edge(int from , int to){
-            this.from = from;
-            this.to = to;
         }
     }
 }
