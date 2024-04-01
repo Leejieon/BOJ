@@ -2,14 +2,13 @@ class Solution {
     final int DEPTH = 2;
     int[][] dir = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     boolean[][] visited;
-    String[] place;
     boolean isPossible, isFirst;
     
     public int[] solution(String[][] places) {
         int[] answer = new int[places.length];
                 
         for(int i = 0; i < places.length; i++) {
-            this.place = places[i];
+            String[] place = places[i];
             isPossible = true;
             
             loop : for(int y = 0; y < 5; y++) {
