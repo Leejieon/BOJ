@@ -4,8 +4,7 @@ class Solution {
     ArrayList<Integer> select = new ArrayList<>();    
     ArrayList<ArrayList<Integer>> key = new ArrayList<>();
     Set<String> set = new HashSet<>();
-    int col, row, prev, answer;
-    boolean isFound;
+    int col, row, answer;
 
     public int solution(String[][] relation) {
         answer = 0;
@@ -13,8 +12,6 @@ class Solution {
         col = relation[0].length;
         
         for(int i = 0; i < col; i++) {
-            isFound = false;
-            prev = 0;
             combination(relation, 0, 0, i + 1);
         }
         
