@@ -26,13 +26,13 @@ class Solution {
     }
     
     int convertToSec(String timeStr) {
-        return Integer.parseInt(timeStr.split(":")[0]) * 60 
-            + Integer.parseInt(timeStr.split(":")[1]);
+        String[] times = timeStr.split(":");
+        return Integer.parseInt(times[0]) * 60 + Integer.parseInt(times[1]);
     }
     
-    String convertToTimeFormat(int sec) {
-        String hour = sec / 60 >= 10 ? "" + sec/60 : "0" + sec/60;
-        String min = sec % 60 >= 10 ? "" + sec%60 : "0" + sec%60;
-        return hour + ":" + min;
+    String convertToTimeFormat(int time) {
+        int min = time/60;
+        int sec = time%60;
+        return String.format("%02d:%02d", min, sec);
     }
 }
